@@ -13,11 +13,12 @@ config = {
   "messagingSenderId": "106103967808",
   "appId": "1:106103967808:web:32cf94bc6e23392f0ccfa5",
   "measurementId": "G-4KHFZMXGW1",
-  "databaseURL":""
+  "databaseURL":"https://fir-project-e6676-default-rtdb.europe-west1.firebasedatabase.app/"
 }
 
 firebase=pyrebase.initialize_app(config)
 auth=firebase.auth()
+db=firebase.database()
 
 @app.route('/', methods=['GET', 'POST'])
 def signin():
@@ -40,6 +41,9 @@ def signup():
         password = request.form['password']
         try:
             login_session['user'] = auth.create_user_with_email_and_password(email, password)
+            user={'fullname':request.form['fullname'], 'username':request.form['username'], 'email':request.form['email'],
+            bio: request.form['bio'], password:request.form['password']}
+            db.child("users").child(login_session['user']['localId'].set(user))
             return redirect(url_for('add_tweet'))
         except:
             error = "Authentication failed"
@@ -48,6 +52,10 @@ def signup():
 
 @app.route('/add_tweet', methods=['GET', 'POST'])
 def add_tweet():
+    if request.method=='POST':
+        try:
+            tweet={'title':request.form['title'], 'text':request.form['text'],'uid':(db.child('users').child(login_session['user']['localId']).get().val())['username']}
+            db.child("tweets").push(tweet)
     return render_template("add_tweet.html")
 
 @app.route('/signout')
@@ -55,6 +63,8 @@ def signout():
     login_session['user'] = None
     auth.current_user = None
     return redirect(url_for('signin'))
+
+
 
 
 if __name__ == '__main__':
