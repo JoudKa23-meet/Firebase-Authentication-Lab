@@ -54,8 +54,11 @@ def signup():
 def add_tweet():
     if request.method=='POST':
         try:
-            tweet={'title':request.form['title'], 'text':request.form['text'],'uid':(db.child('users').child(login_session['user']['localId']).get().val())['username']}
+            tweet={'title':request.form['title'],'username':request.form['username'], 'text':request.form['text'], 'uid': db.child('users').child(login_session['user']['localId']).get().val()}
             db.child("tweets").push(tweet)
+            return redirect(url_for("tweets"))
+        except:
+            error=''
     return render_template("add_tweet.html")
 
 @app.route('/signout')
@@ -64,7 +67,10 @@ def signout():
     auth.current_user = None
     return redirect(url_for('signin'))
 
-
+@app.route('/tweets')
+def tweets():
+    tweets=db.child("tweets").get().val()
+    return render_template("tweets.html", tweets=tweets)
 
 
 if __name__ == '__main__':

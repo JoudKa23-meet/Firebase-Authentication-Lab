@@ -1,1 +1,15 @@
-tweets
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Tweets</title>
+</head>
+<body>
+	{% for tweet in tweets %}
+	<h1>{{tweets[tweet]['title']}}</h1>
+	<h4>{{tweets[tweet]['bio1']}}</h4>
+	<h4>{{tweets[tweet]['username']}}</h4>
+	{% endfor %}
+</body>
+</html>
